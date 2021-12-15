@@ -4,10 +4,8 @@ from .models import User, Team, Profile, Task
 from .serializers import UserSerializer, TeamSerializer, ProfileSerializer, TaskSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-# from rest_framework.decorators import authentication_classes
-# from rest_framework.decorators import permission_classes
-# from rest_framework.authentication import TokenAuthentication
-# from rest_framework.permissions import IsAuthenticated
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.authtoken.models import Token
 
 
 @api_view(['GET'])
@@ -79,6 +77,12 @@ def user_detail(request,pk):
     serializer = UserSerializer(users, many=False)
     return Response(serializer.data)
 
+@api_view(['GET'])
+def profile_detail(request,pk):
+    profile = Profile.objects.get(user_id=pk)
+    serializer = ProfileSerializer(profile, many=False)
+    return Response(serializer.data)
+
 
 @api_view(['GET'])
 def team_list(request):
@@ -94,7 +98,21 @@ def profile_list_team(request, pk):
     return Response(serializer.data)
 
 
+class CustomAuthToken(ObtainAuthToken):
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data,
+                                           context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        token, created = Token.objects.get_or_create(user=user)
+        return Response({
+            'token': token.key,
+            'user_id': user.pk,
+        })
+
 @api_view(['DELETE'])
 def logout(request, format=None):
         request.user.auth_token.delete()
         return Response("Success logout")
+
+
