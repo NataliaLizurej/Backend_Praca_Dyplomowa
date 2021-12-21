@@ -15,12 +15,18 @@ class TeamSerializer(serializers.ModelSerializer):
 
 
 class ProfileSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source='user.username', default='')
+    team = serializers.CharField(source='team.name', default='')
+
     class Meta:
         model = Profile
-        fields = ['id', 'user', 'team', 'role']
+        fields = ['id', 'username', 'team', 'role']
 
 
 class TaskSerializer(serializers.ModelSerializer):
+    author = serializers.CharField(read_only=True)
+    worker = serializers.CharField(read_only=True)
+
     class Meta:
         model = Task
         fields = ['id', 'title', 'author', 'worker', 'description', 'url', 'status']
