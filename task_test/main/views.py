@@ -24,12 +24,19 @@ def task_detail(request, pk):
 
 @api_view(['POST'])
 def task_create(request):
-    serializer = TaskSerializer(data=request.data)
-
-    if serializer.is_valid():
-        serializer.save()
-
+    author_id = request.data.get("author", None)
+    worker_id = request.data.get("worker", None)
+    author_task = Profile.objects.get(id=author_id)
+    worker_task = Profile.objects.get(id=worker_id)
+    task = Task.objects.create(title=request.data.get("title"),
+                               author=author_task,
+                               worker=worker_task,
+                               description=request.data.get("description"),
+                               url=request.data.get("url"),
+                               status=request.data.get("status"))
+    serializer = TaskSerializer(task)
     return Response(serializer.data)
+
 
 @api_view(['PUT'])
 def task_update(request, pk):
@@ -54,14 +61,14 @@ def task_delete(request, pk):
 def task_list_worker(request, pk):
     tasks = Task.objects.filter(worker=pk)
     serializer = TaskSerializer(tasks, many=True)
-    return Response(serializer.data)
+    return Response(serializer.data[::-1])
 
 
 @api_view(['GET'])
 def task_list_author(request, pk):
     tasks = Task.objects.filter(author=pk)
     serializer = TaskSerializer(tasks, many=True)
-    return Response(serializer.data)
+    return Response(serializer.data[::-1])
 
 
 @api_view(['GET'])
@@ -93,7 +100,7 @@ def team_list(request):
 
 @api_view(['GET'])
 def profile_list_team(request, pk):
-    profiles = Profile.objects.filter(team=pk)
+    profiles = Profile.objects.filter(team__name=pk, role="Programmer")
     serializer = ProfileSerializer(profiles, many=True)
     return Response(serializer.data)
 
