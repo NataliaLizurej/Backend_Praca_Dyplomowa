@@ -22,6 +22,12 @@ def task_detail(request, pk):
     return Response(serializer.data)
 
 
+# @api_view(['GET'])
+# def id_from_name(request,name):
+#     profile = Profile.
+
+
+
 @api_view(['POST'])
 def task_create(request):
     author_id = request.data.get("author", None)
@@ -41,10 +47,10 @@ def task_create(request):
 @api_view(['PUT'])
 def task_update(request, pk):
     task = Task.objects.get(id=pk)
-    serializer = TaskSerializer(instance=task, data=request.data)
+    task.status = request.data.get("status")
+    task.save()
+    serializer = TaskSerializer(task)
 
-    if serializer.is_valid():
-        serializer.save()
 
     return Response(serializer.data)
 
