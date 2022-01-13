@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     'main.apps.MainConfig',
     'rest_framework.authtoken',
     'corsheaders',
+    'admin_interface',
+    'colorfield',
 
     'django.contrib.admin',
     'django.contrib.auth',
