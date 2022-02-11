@@ -33,7 +33,7 @@ class Profile(models.Model):
 
 STATUS_CHOICES = (
     ('Created', 'Created'),
-    ('In proccess', 'In proccess'),
+    ('In process', 'In process'),
     ('Done', 'Done'),
     ('Closed', 'Closed')
 )
